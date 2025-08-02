@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  # --- PORTAL-BOOKING SERVICES ---
+  portal-booking-app:
+    build:
+      context: ./portal-booking # Konteks build mengarah ke sub-direktori portal-booking
+      dockerfile: Dockerfile
+    container_name: portal_booking_app
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  portal-booking-nginx:
+    image: nginx:alpine
+    container_name: portal_booking_nginx
+    restart: unless-stopped
+    depends_on:
+      - portal-booking-app
+    networks:
+      - app-network
+
+  portal-booking-db:
+    image: mysql:8.0
+    container_name: portal_booking_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: portal_booking
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - portal_booking_db_data:/var/lib/mysql # Volume spesifik untuk Portal Booking DB
+    networks:
+      - app-network
+
+  # --- ROOM-SERVICE SERVICES ---
+  room-service-app:
+    build:
+      context: ./room-service # Konteks build mengarah ke sub-direktori room-service
+      dockerfile: Dockerfile
+    container_name: room_service_app
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  room-service-nginx:
+    image: nginx:alpine
+    container_name: room_service_nginx
+    restart: unless-stopped
+    depends_on:
+      - room-service-app
+    networks:
+      - app-network
+
+  room-service-db:
+    image: mysql:8.0
+    container_name: room_service_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ruangan_db
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - room_service_db_data:/var/lib/mysql # Volume spesifik untuk Room Service DB
+    networks:
+      - app-network
+
+# --- VOLUMES ---
+volumes:
+  portal_booking_db_data: # Volume bernama untuk database Portal Booking
+  room_service_db_data:   # Volume bernama untuk database Room Service
+
+# --- NETWORKS ---
+networks:
+  app-network:
+    driver: bridge

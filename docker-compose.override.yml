@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  # --- PORTAL-BOOKING SERVICES ---
+  portal-booking-app:
+    volumes:
+      - ./portal-booking:/var/www/html # Mount kode dari sub-direktori
+
+  portal-booking-nginx:
+    ports:
+      - "8000:80" # Akses Portal Booking di port 8000
+    volumes:
+      - ./portal-booking:/var/www/html # Mount kode untuk akses Nginx
+      - ./portal-booking/docker-compose/nginx/default.conf:/etc/nginx/conf.d/default.conf # Konfigurasi Nginx
+
+  # --- ROOM-SERVICE SERVICES ---
+  room-service-app:
+    volumes:
+      - ./room-service:/var/www/html # Mount kode dari sub-direktori
+
+  room-service-nginx:
+    ports:
+      - "8001:80" # Akses Room Service di port 8001
+    volumes:
+      - ./room-service:/var/www/html # Mount kode untuk akses Nginx
+      - ./room-service/docker-compose/nginx/default.conf:/etc/nginx/conf.d/default.conf # Konfigurasi Nginx
+
