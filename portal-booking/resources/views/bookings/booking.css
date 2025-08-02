@@ -1,0 +1,102 @@
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #e6ecf0;
+  margin: 0;
+  padding: 40px 20px;
+  color: #333;
+}
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  padding: 30px;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+h1 {
+  text-align: center;
+  color: #2c3e50;
+  margin-bottom: 30px;
+  font-family: inherit; /* gunakan font dari body */
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  border-radius: 8px;
+  overflow: hidden;
+  font-family: inherit; /* pastikan mewarisi font */
+}
+
+th, td {
+  padding: 14px 16px;
+  text-align: left;
+  border-bottom: 1px solid #f0f0f0;
+  vertical-align: middle;
+  font-family: inherit;
+}
+
+th {
+  background-color: #fb7fff;
+  color: #000000;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+tr:nth-child(even) {
+  background-color: #f8faff;
+}
+
+tr:hover {
+  background-color: #eaf1ff;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  height: 100%;
+  font-family: inherit;
+}
+
+.actions button {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: white;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+  font-family: inherit;
+}
+
+.actions button:hover {
+  transform: scale(1.05);
+  opacity: 0.95;
+}
+
+.actions button:first-child {
+  background-color: #43dcd9;
+}
+
+.actions button:last-child {
+  background-color: #e74c3c;
+}

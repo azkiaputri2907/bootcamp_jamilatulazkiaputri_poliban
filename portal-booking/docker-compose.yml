@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: . # Konteks build adalah direktori saat ini (root proyek)
+      dockerfile: Dockerfile # Gunakan Dockerfile yang telah kita buat
+    container_name: portal_booking_app
+    restart: unless-stopped # Akan otomatis restart kecuali dihentikan secara manual
+    volumes:
+      - .:/var/www/html # Mount kode aplikasi dari host ke container agar perubahan langsung terlihat
+    networks:
+      - app-network # Terhubung ke jaringan kustom 'app-network'
+
+  nginx:
+    image: nginx:alpine # Gunakan image Nginx Alpine yang ringan
+    container_name: portal_booking_nginx
+    restart: unless-stopped
+    ports:
+      - "8000:80" # Map port 80 dari container Nginx ke port 8000 di mesin host Anda
+    volumes:
+      - .:/var/www/html # Mount kode aplikasi untuk Nginx agar bisa mengakses file statis
+      - ./docker-compose/nginx/default.conf:/etc/nginx/conf.d/default.conf # Pasang file konfigurasi Nginx
+    depends_on:
+      - app # Nginx akan dijalankan setelah service 'app' (PHP-FPM) siap
+    networks:
+      - app-network
+
+  db:
+    image: mysql:8.0 # Menggunakan image MySQL versi 8.0
+    container_name: portal_booking_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: portal_booking # Nama database diambil dari .env
+      MYSQL_ROOT_PASSWORD: root # Password root database diambil dari .env
+    volumes:
+      - dbdata:/var/lib/mysql # Volume untuk persistensi data database MySQL
+    ports:
+      - "3307:3306" # Opsional: Membuka port MySQL di host (3307) ke container (3306)
+    networks:
+      - app-network
+
+# Definisi volume untuk persistensi data database
+volumes:
+  dbdata:
+
+# Definisi jaringan kustom
+networks:
+  app-network:
+    driver: bridge
