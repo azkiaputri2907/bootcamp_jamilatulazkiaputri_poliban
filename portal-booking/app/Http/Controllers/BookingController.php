@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Exception;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class BookingController extends Controller
 {
@@ -34,9 +35,7 @@ class BookingController extends Controller
         $rooms = [];
         
         try {
-
-            $token =config(key: 'services.room_service.token');
-            //$response = Http::get('http://room-service-nginx/api/rooms');
+            $token = config(key: 'services.room_service.token');
             $response = Http::withToken(token: $token)->get(url: 'http://room-service-nginx/api/rooms');
 
             if ($response->successful()) {
@@ -156,12 +155,34 @@ class BookingController extends Controller
     public function store(Request $request)
     {
         // Pastikan nama input di form dan controller sama (nama_pengguna)
-        $request->validate([
+        $validatedData = $request->validate([
             'nama_pengguna' => 'required|string|max:255',
             'room_id' => 'required|integer',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after:start_date',
         ]);
+
+        // Tambahkan validasi bentrok
+        $existingBooking = Booking::where('room_id', $validatedData['room_id'])
+            ->where(function ($query) use ($validatedData) {
+                $query->where(function ($query) use ($validatedData) {
+                    $query->where('start_date', '<=', $validatedData['start_date'])
+                          ->where('end_date', '>', $validatedData['start_date']);
+                })->orWhere(function ($query) use ($validatedData) {
+                    $query->where('start_date', '<', $validatedData['end_date'])
+                          ->where('end_date', '>=', $validatedData['end_date']);
+                })->orWhere(function ($query) use ($validatedData) {
+                    $query->where('start_date', '>=', $validatedData['start_date'])
+                          ->where('end_date', '<=', $validatedData['end_date']);
+                });
+            })
+            ->first();
+
+        if ($existingBooking) {
+            throw ValidationException::withMessages([
+                'booking_conflict' => 'Ruangan tidak tersedia pada jadwal yang dipilih karena sudah dibooking.'
+            ]);
+        }
 
         try {
             // Cari user berdasarkan nama, atau buat user baru jika tidak ditemukan
